@@ -40,7 +40,7 @@ them. An ESP32-S3 manages the modules over I2C and runs the fan and status LEDs.
 | Item | Value |
 |---|---|
 | Input | 12 V DC ± 5 % (11.4–12.6 V), 3 A, barrel jack (centre positive) |
-| Module power | 3.3 V, up to 5 W per module (SFF-8679 Power Class 7), 11 W total |
+| Module power | 3.3 V, up to 5 W per optical module (SFF-8679 Power Class 7); 11 W firmware budget, 10.5 W supported configuration (two 5 W optics + two passive DACs) |
 | PCB | 100 × 100 mm, 4 layers, 1.6 mm, JLCPCB stack-up JLC04161H-3313 with impedance control |
 | Differential pairs | 100 Ω, 0.13 mm trace / 0.15 mm gap on the outer layers |
 | Vias | 0.3 mm drill / 0.45 mm pad |
@@ -70,6 +70,8 @@ Production files are attached to each [GitHub release](../../releases):
    - **Min via hole size:** **0.3 mm** (the free option).
 3. Enable PCB assembly (standard PCBA, top side), then upload `BOM_qsfp-booster.xlsx` and
    `CPL_qsfp-booster.xlsx`.
+   In the assembly preview, check the parts by their LCSC number rather than the CPL "Device" name, which
+   is stale for some resistors: R23 must be **C11702** (1 kΩ) and R25–R30 **C25076** (100 Ω).
 4. Hand-solder the parts that are not in the BOM:
 
    | Ref | Part | LCSC |
@@ -116,7 +118,8 @@ high-power classes are granted over I2C (byte 93) within a 5 W per-port and 11 W
 - **ESP32 board preparation: remove its 3.3 V regulator.** On the YD-ESP32-S3 (and similar) board, desolder
   the **5 V → 3.3 V LDO** (CJ6107A33GW, SOT-223: its input is the board's 5 V, its tab/output is the 3V3 rail),
   and **leave the board's IN-OUT jumper open**. If that jumper were bridged on a board without its regulator, the
-  USB-sense backup (Q7) would see USB 5 V and switch this board's 3.3 V off, leaving the ESP32 unpowered.
+  USB-sense backup (Q7) would see USB 5 V and turn Q4's channel off: the ESP32 would then be fed only through
+  Q4's body diode (a diode drop below 3.3 V) and may brown out. Do not bridge it.
   These steps are validated for the YD-ESP32-S3 V1.4; check the schematic of any other board first. The ESP32 then gets its 3.3 V only from this board, through
   Q4, which Q5 closes while 12 V is present, so USB can never create a second 3.3 V source. USB data (flashing,
   console) still works, but the ESP32 only runs while 12 V is applied. Espressif treats USB and 3V3-pin power as
