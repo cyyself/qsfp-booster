@@ -185,7 +185,7 @@ working, but they are worth knowing before you rely on it:
   automatic clearing is not guaranteed. The fuse's hold current also drops with temperature (about 1.5 A at 70 °C,
   close to a 5 W module's 1.52 A), so keep the board well ventilated with high-power optics.
 - **Module supply filtering:** each port's fuse output runs on the top layer down a column of bulk and bypass
-  capacitors (47 µF, 10 µF, 3 × 100 nF) at the board edge (fuse inputs take 4 vias on F1/F3, 3 on F2/F4 from the
+  capacitors (47 µF, 10 µF, 3 × 100 nF) at the board edge (each fuse input takes the same 3 vias from the
   main 3.3 V plane), and drops through 5 vias spread along that capacitor column into
   an L-shaped copper area on inner layer 3 that runs along the cage edge to the connector's VCC vias. There is no
   direct path from the fuse to the connector, so the supply current flows past the capacitors instead of bypassing
