@@ -164,7 +164,7 @@ side and a 100 Ω series resistor next to the ESP32 socket. ModSelL and LPMode a
   Fit C32 before the first power-up: plugging into a live adapter makes the cable's inductance ring against the
   input ceramics, and C32 damps that spike so D2 only has to clip what is left. Where possible, plug the DC jack
   in first and then switch the adapter on at the wall, so the 12 V ramps up instead of stepping.
-- **Fan (J7):** GND, 12V, TACH, PWM (silkscreened). The fan's 12 V is switched on the high side by Q6
+- **Fan (J7):** GND, 12V, TAC (tach), PWM (silkscreened). The fan's 12 V is switched on the high side by Q6
   (AO3407A), which Q2 (AO3400A) turns on when IO46 goes high, so the fan's ground is always connected. The fan is off unless the ESP32 is running and turns it on. Use a fan drawing
   at most 0.6 A (start-up included): its 12 V feed goes through a 1 A-hold PPTC fuse (F5) that derates when warm.
 - **Supported module configuration:** passive DAC cables on the DAC ports (J1/J2) and optics up to 5 W (power
