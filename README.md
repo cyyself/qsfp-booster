@@ -35,7 +35,7 @@ them. An ESP32-S3 manages the modules over I2C and runs the fan and status LEDs.
 - **Cages:** the same press-fit cage on all four ports, each with an exposed ground strip under its
   EMI fingers.
 - **Indicators:** one LED per port and a power LED, spaced along the board edges.
-- **Input protection:** reverse-polarity P-MOSFET and SMAJ12A surge suppressor.
+- **Input protection:** 2.6 A-hold PPTC input fuse (F6) and SMAJ12A surge suppressor. No reverse-polarity protection.
 - **Board:** 100 × 100 mm, 4 layers.
 
 ## Specifications
@@ -43,7 +43,7 @@ them. An ESP32-S3 manages the modules over I2C and runs the fan and status LEDs.
 | Item | Value |
 |---|---|
 | Input | 12 V DC ± 5 % (11.4–12.6 V), 3 A, barrel jack (centre positive) |
-| Module power | 3.3 V, up to 5 W per optical module (SFF-8679 Power Class 7); 10.5 W supported configuration (two 5 W optics + two passive DACs). The 3.3 V copper (U1 → C33 → inner plane) is laid out for 10 A, but the 3 A input limits the board to about 30 W in, and only the configuration above is supported |
+| Module power | 3.3 V, up to 5 W per optical module (SFF-8679 Power Class 7); 10.5 W supported configuration (two 5 W optics + two passive DACs). The 3.3 V copper (U1 → C33 → inner plane) is laid out for 10 A, but the supported load is a design budget, not something the board enforces: 10.5 W of modules plus a fan drawing at most 0.6 A, about 1.7 A (20 W) in at 12 V. The input fuse F6 (2.6 A hold, less when warm) is not a power limiter, and only the configuration above is supported |
 | PCB | 100 × 100 mm, 4 layers, 1.6 mm, JLCPCB stack-up JLC04161H-3313 with impedance control |
 | Differential pairs | 100 Ω, 0.13 mm trace / 0.15 mm gap on the outer layers |
 | Vias | 0.3 mm drill / 0.45 mm pad |
@@ -151,8 +151,16 @@ side and a 100 Ω series resistor next to the ESP32 socket. ModSelL and LPMode a
   surge suppressor across the input is rated for 12.0 V continuous (stand-off) and breaks down from 13.3 V, so
   a supply at the top of the range already sits slightly above its stand-off rating. Prefer a supply close to
   12.0 V, and check D2 stays cold on the first board. The fan output's clamp D8 is the same SMAJ12A (forward-biased
-  only for the fan's switch-off spike), so check it stays cold with the fan running too. The reverse-polarity
-  P-MOSFET Q1 (AO3407A) is rated ±20 V gate-source, so it needs no gate clamp across that input range.
+  only for the fan's switch-off spike), so check it stays cold with the fan running too. The input goes
+  through a PPTC fuse (F6, 2.6 A hold, 16 V) straight onto the 12 V rail; there is no reverse-polarity
+  protection, so use only a centre-positive, short-circuit-protected adapter. With a reversed adapter D2 conducts
+  forward and shorts it, and the whole 12 V rail (U1 included) sees about −1 V. Nothing guarantees that this clears:
+  a 3 A adapter that current-limits instead of shutting down sits between F6's 2.6 A hold and 5 A trip, so F6 may
+  never trip while D2 dissipates about 3 W. Unplug at once, and inspect D2, C32 and U1 before powering the board
+  again. F6 is a PPTC: when it trips it goes high-resistance rather than open, and resets only after it cools.
+  Its hold current falls with temperature (datasheet: 2.6 A at 25 °C, 1.94 A at 60 °C, 1.35 A at 70 °C), while the
+  board's estimated worst-case input with both 5 W optics and a 0.6 A fan is about 1.7 A. Keep the area around F6
+  cool, and on the first board measure the input current and F6's temperature at full load in the enclosure.
   Fit C32 before the first power-up: plugging into a live adapter makes the cable's inductance ring against the
   input ceramics, and C32 damps that spike so D2 only has to clip what is left. Where possible, plug the DC jack
   in first and then switch the adapter on at the wall, so the 12 V ramps up instead of stepping.
